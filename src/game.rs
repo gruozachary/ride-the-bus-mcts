@@ -43,7 +43,6 @@ pub enum State {
     Stage3PlayerPicked(card::Card, card::Card, InOut),
     Stage3DealerPicked(card::Card, card::Card, InOut, card::Card),
     Stage4PlayerPicked(card::Card, card::Card, card::Card, card::Suit),
-    Stage4DealerPicked(card::Card, card::Card, card::Card, card::Suit, card::Card),
     Finished(u32),
 }
 impl State {
@@ -121,17 +120,8 @@ impl State {
                     if suit != &card3.suit {
                         Some(State::Finished(0))
                     } else {
-                        Some(State::Stage4DealerPicked(
-                            *card, *card1, *card2, *suit, card3,
-                        ))
+                        Some(State::Finished(480))
                     }
-                } else {
-                    None
-                }
-            }
-            State::Stage4DealerPicked(card, card1, card2, suit, card3) => {
-                if let Move::Finish = mov {
-                    Some(State::Finished(480))
                 } else {
                     None
                 }
