@@ -1,3 +1,5 @@
+use std::fmt::{Display, write};
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Suit {
     Hearts,
@@ -15,11 +17,29 @@ impl Suit {
         }
     }
 }
+impl Display for Suit {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Suit::Hearts => write!(f, "Hearts"),
+            Suit::Diamonds => write!(f, "Diamonds"),
+            Suit::Clubs => write!(f, "Clubs"),
+            Suit::Spades => write!(f, "Spades"),
+        }
+    }
+}
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum Colour {
     Red,
     Black,
+}
+impl Display for Colour {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Colour::Red => write!(f, "Red"),
+            Colour::Black => write!(f, "Black"),
+        }
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -38,6 +58,25 @@ pub enum Value {
     King,
     Ace,
 }
+impl Display for Value {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Value::Two => write!(f, "Two"),
+            Value::Three => write!(f, "Three"),
+            Value::Four => write!(f, "Four"),
+            Value::Five => write!(f, "Five"),
+            Value::Six => write!(f, "Six"),
+            Value::Seven => write!(f, "Seven"),
+            Value::Eight => write!(f, "Eight"),
+            Value::Nine => write!(f, "Nine"),
+            Value::Ten => write!(f, "Ten"),
+            Value::Jack => write!(f, "Jack"),
+            Value::Queen => write!(f, "Queen"),
+            Value::King => write!(f, "King"),
+            Value::Ace => write!(f, "Ace"),
+        }
+    }
+}
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Card {
@@ -54,6 +93,11 @@ impl Card {
             .filter(|card| cards.contains(card))
             .copied()
             .collect()
+    }
+}
+impl Display for Card {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} of {}", self.value, self.suit)
     }
 }
 
