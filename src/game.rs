@@ -3,7 +3,7 @@ use std::str::FromStr;
 use crate::card;
 
 #[derive(Debug, Clone, Copy)]
-enum HiLo {
+pub enum HiLo {
     Higher,
     Lower,
 }
@@ -17,7 +17,7 @@ impl HiLo {
 }
 
 #[derive(Debug, Clone, Copy)]
-enum InOut {
+pub enum InOut {
     Inside,
     Outside,
 }
@@ -115,7 +115,7 @@ impl State {
                     None
                 }
             }
-            State::Stage4PlayerPicked(card, card1, card2, suit) => {
+            State::Stage4PlayerPicked(_, _, _, suit) => {
                 if let Move::Card(card3) = mov {
                     if suit != &card3.suit {
                         Some(State::Finished(0))
@@ -127,6 +127,50 @@ impl State {
                 }
             }
             State::Finished(_) => None,
+        }
+    }
+    fn get_valid_moves(&self) -> Vec<Move> {
+        match self {
+            State::Start => vec![
+                Move::Colour(card::Colour::Red),
+                Move::Colour(card::Colour::Black),
+            ],
+            State::Stage1PlayerPicked(_) => card::Card::rest_of_deck(&[])
+                .into_iter()
+                .map(|c| Move::Card(c))
+                .collect(),
+            State::Stage1DealerPicked(_, _) => vec![
+                Move::HiLo(HiLo::Higher),
+                Move::HiLo(HiLo::Lower),
+                Move::Finish,
+            ],
+            State::Stage2PlayerPicked(card, _) => card::Card::rest_of_deck(&[*card])
+                .into_iter()
+                .map(|c| Move::Card(c))
+                .collect(),
+            State::Stage2DealerPicked(_, _, _) => vec![
+                Move::InOut(InOut::Inside),
+                Move::InOut(InOut::Outside),
+                Move::Finish,
+            ],
+            State::Stage3PlayerPicked(card, card1, _) => card::Card::rest_of_deck(&[*card, *card1])
+                .into_iter()
+                .map(|c| Move::Card(c))
+                .collect(),
+            State::Stage3DealerPicked(_, _, _, _) => vec![
+                Move::Suit(card::Suit::Hearts),
+                Move::Suit(card::Suit::Diamonds),
+                Move::Suit(card::Suit::Clubs),
+                Move::Suit(card::Suit::Spades),
+                Move::Finish,
+            ],
+            State::Stage4PlayerPicked(card, card1, card2, _) => {
+                card::Card::rest_of_deck(&[*card, *card1, *card2])
+                    .into_iter()
+                    .map(|c| Move::Card(c))
+                    .collect()
+            }
+            State::Finished(_) => vec![],
         }
     }
 }
