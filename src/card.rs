@@ -1,6 +1,6 @@
 use std::fmt::{Display, write};
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Suit {
     Hearts,
     Diamonds,
@@ -28,7 +28,7 @@ impl Display for Suit {
     }
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Colour {
     Red,
     Black,
@@ -42,7 +42,7 @@ impl Display for Colour {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Value {
     Two,
     Three,
@@ -78,7 +78,7 @@ impl Display for Value {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Card {
     pub suit: Suit,
     pub value: Value,

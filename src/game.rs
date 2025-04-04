@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use crate::card;
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 enum HiLo {
     Higher,
     Lower,
@@ -16,7 +16,7 @@ impl HiLo {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 enum InOut {
     Inside,
     Outside,
@@ -33,8 +33,8 @@ impl InOut {
     }
 }
 
-#[derive(Clone, Copy)]
-enum State {
+#[derive(Debug, Clone, Copy)]
+pub enum State {
     Start,
     Stage1PlayerPicked(card::Colour),
     Stage1DealerPicked(card::Colour, card::Card),
@@ -47,7 +47,7 @@ enum State {
     Finished(u32),
 }
 impl State {
-    fn apply_move(&self, mov: Move) -> Option<Self> {
+    pub fn apply_move(&self, mov: Move) -> Option<Self> {
         match self {
             State::Start => {
                 if let Move::Colour(colour) = mov {
@@ -133,7 +133,8 @@ impl State {
     }
 }
 
-enum Move {
+#[derive(Debug)]
+pub enum Move {
     Colour(card::Colour),
     HiLo(HiLo),
     InOut(InOut),
@@ -159,7 +160,7 @@ impl FromStr for Move {
             "finish" => Ok(Move::Finish),
             _ => {
                 let words: Vec<&str> = s.split_ascii_whitespace().collect();
-                if words.len() == 3 && words[1] != "of" {
+                if words.len() != 3 || words[1] != "of" {
                     return Err("Parse failed");
                 }
                 let suit = match words[2] {
