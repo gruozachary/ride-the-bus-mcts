@@ -90,7 +90,7 @@ impl Card {
 
     pub fn rest_of_deck(cards: &[Self]) -> Vec<Self> {
         DECK.iter()
-            .filter(|card| cards.contains(card))
+            .filter(|card| !cards.contains(card))
             .copied()
             .collect()
     }
