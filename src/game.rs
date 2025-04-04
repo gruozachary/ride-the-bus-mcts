@@ -179,14 +179,19 @@ impl State {
     pub fn playout<R: rand::Rng>(&self, mut rng: &mut R) -> u32 {
         let mut game = *self;
         loop {
-            println!("Current state: {:?}", game);
             if let State::Finished(x) = game {
                 return x;
             }
             let valid_moves = game.get_valid_moves();
             let mov = valid_moves.choose(&mut rng).unwrap();
-            println!("valid move: {:?}", mov);
             game = game.apply_move(*mov).unwrap();
+        }
+    }
+
+    pub fn is_terminal(&self) -> bool {
+        match self {
+            Self::Finished(_) => true,
+            _ => false,
         }
     }
 }
