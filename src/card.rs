@@ -1,12 +1,12 @@
 #[derive(Clone, Copy, PartialEq)]
-enum Suit {
+pub enum Suit {
     Hearts,
     Diamonds,
     Clubs,
     Spades,
 }
 impl Suit {
-    fn colour(&self) -> Colour {
+    pub fn colour(&self) -> Colour {
         match self {
             Suit::Hearts => Colour::Red,
             Suit::Diamonds => Colour::Red,
@@ -17,13 +17,13 @@ impl Suit {
 }
 
 #[derive(Clone, Copy, PartialEq)]
-enum Colour {
+pub enum Colour {
     Red,
     Black,
 }
 
 #[derive(Clone, Copy, PartialEq)]
-enum Value {
+pub enum Value {
     Two,
     Three,
     Four,
@@ -40,16 +40,16 @@ enum Value {
 }
 
 #[derive(Clone, Copy, PartialEq)]
-struct Card {
+pub struct Card {
     suit: Suit,
     value: Value,
 }
 impl Card {
-    const fn new(suit: Suit, value: Value) -> Self {
+    pub const fn new(suit: Suit, value: Value) -> Self {
         Card { suit, value }
     }
 
-    fn rest_of_deck(cards: &[Self]) -> Vec<Self> {
+    pub fn rest_of_deck(cards: &[Self]) -> Vec<Self> {
         DECK.iter()
             .filter(|card| cards.contains(card))
             .copied()
