@@ -1,4 +1,4 @@
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Suit {
     Hearts,
     Diamonds,
@@ -22,7 +22,7 @@ pub enum Colour {
     Black,
 }
 
-#[derive(Clone, Copy, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Value {
     Two,
     Three,
@@ -39,7 +39,7 @@ pub enum Value {
     Ace,
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Card {
     pub suit: Suit,
     pub value: Value,
@@ -54,11 +54,6 @@ impl Card {
             .filter(|card| cards.contains(card))
             .copied()
             .collect()
-    }
-}
-impl PartialOrd for Card {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.value.partial_cmp(&other.value)
     }
 }
 
