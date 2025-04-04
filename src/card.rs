@@ -22,7 +22,7 @@ pub enum Colour {
     Black,
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, PartialOrd)]
 pub enum Value {
     Two,
     Three,
@@ -41,8 +41,8 @@ pub enum Value {
 
 #[derive(Clone, Copy, PartialEq)]
 pub struct Card {
-    suit: Suit,
-    value: Value,
+    pub suit: Suit,
+    pub value: Value,
 }
 impl Card {
     pub const fn new(suit: Suit, value: Value) -> Self {
@@ -54,6 +54,11 @@ impl Card {
             .filter(|card| cards.contains(card))
             .copied()
             .collect()
+    }
+}
+impl PartialOrd for Card {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.value.partial_cmp(&other.value)
     }
 }
 
