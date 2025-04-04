@@ -20,8 +20,31 @@ impl Node {
         }))
     }
 
-    fn choose_best_child(&self) -> Arc<RwLock<Node>> {
-        todo!()
+    pub fn start() -> Arc<RwLock<Node>> {
+        Arc::new(RwLock::new(Node {
+            reward: 0.0,
+            visits: 0.0,
+            state: State::Start,
+            parent: None,
+            children: vec![],
+        }))
+    }
+
+    fn score_node(&self, root_visits: f64) -> f64 {
+        (self.reward / self.visits) + 5.0 * ((root_visits.ln() / self.visits).sqrt())
+    }
+
+    fn choose_best_child(&self, root_visits: f64) -> Arc<RwLock<Node>> {
+        self.children
+            .iter()
+            .max_by(|x, y| {
+                x.read()
+                    .unwrap()
+                    .score_node(root_visits)
+                    .total_cmp(&y.read().unwrap().score_node(root_visits))
+            })
+            .unwrap()
+            .to_owned()
     }
 
     fn select_node(root: Arc<RwLock<Node>>) -> Arc<RwLock<Node>> {
@@ -29,7 +52,10 @@ impl Node {
 
         while !node.read().unwrap().state.is_terminal() && !node.read().unwrap().children.is_empty()
         {
-            let next = node.read().unwrap().choose_best_child();
+            let next = node
+                .read()
+                .unwrap()
+                .choose_best_child(root.read().unwrap().visits);
             node = next;
         }
 
@@ -66,7 +92,7 @@ impl Node {
 
             node = Node::select_node(node);
 
-            if (!node.read().unwrap().state.is_terminal()) {
+            if !node.read().unwrap().state.is_terminal() {
                 node = Node::expand(node);
             }
 
