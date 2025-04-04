@@ -131,7 +131,7 @@ impl State {
             State::Finished(_) => None,
         }
     }
-    fn get_valid_moves(&self) -> Vec<Move> {
+    pub fn get_valid_moves(&self) -> Vec<Move> {
         match self {
             State::Start => vec![
                 Move::Colour(card::Colour::Red),
