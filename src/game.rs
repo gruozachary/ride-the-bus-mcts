@@ -4,7 +4,7 @@ use rand::seq::IndexedRandom;
 
 use crate::card;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum HiLo {
     Higher,
     Lower,
@@ -18,7 +18,7 @@ impl HiLo {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum InOut {
     Inside,
     Outside,
@@ -35,7 +35,7 @@ impl InOut {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum State {
     Start,
     Stage1PlayerPicked(card::Colour),

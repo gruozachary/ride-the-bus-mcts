@@ -1,13 +1,16 @@
-use std::sync::{Arc, RwLock, mpsc::Receiver};
+use std::{
+    f64::consts::SQRT_2,
+    sync::{Arc, RwLock, mpsc::Receiver},
+};
 
 use crate::game::{Move, State};
 
 pub struct Node {
     reward: f64,
     visits: f64,
-    state: State,
+    pub state: State,
     parent: Option<Arc<RwLock<Node>>>,
-    children: Vec<Arc<RwLock<Node>>>,
+    pub children: Vec<Arc<RwLock<Node>>>,
 }
 impl Node {
     pub fn new(state: State, parent: Arc<RwLock<Node>>) -> Arc<RwLock<Node>> {
@@ -31,7 +34,7 @@ impl Node {
     }
 
     fn score_node(&self, root_visits: f64) -> f64 {
-        (self.reward / self.visits) + 5.0 * ((root_visits.ln() / self.visits).sqrt())
+        (self.reward / self.visits) + SQRT_2 * ((root_visits.ln() / self.visits).sqrt())
     }
 
     fn choose_best_child(&self, root_visits: f64) -> Arc<RwLock<Node>> {
@@ -96,9 +99,21 @@ impl Node {
                 node = Node::expand(node);
             }
 
-            let reward = node.read().unwrap().state.playout(&mut rng) as f64;
+            let reward = node.read().unwrap().state.playout(&mut rng) as f64 / 480.0;
 
             Node::backpropagate(node, reward);
         }
+    }
+
+    pub fn get_best_moves(&self) -> Vec<(State, f64)> {
+        self.children
+            .iter()
+            .map(|c| {
+                (
+                    c.read().unwrap().state,
+                    c.read().unwrap().visits / self.visits,
+                )
+            })
+            .collect()
     }
 }
