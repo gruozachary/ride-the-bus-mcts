@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::card;
 
 #[derive(Clone, Copy)]
@@ -138,4 +140,53 @@ enum Move {
     Suit(card::Suit),
     Card(card::Card),
     Finish,
+}
+impl FromStr for Move {
+    type Err = &'static str;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "red" => Ok(Move::Colour(card::Colour::Red)),
+            "black" => Ok(Move::Colour(card::Colour::Black)),
+            "higher" => Ok(Move::HiLo(HiLo::Higher)),
+            "lower" => Ok(Move::HiLo(HiLo::Lower)),
+            "inside" => Ok(Move::InOut(InOut::Inside)),
+            "outside" => Ok(Move::InOut(InOut::Outside)),
+            "hearts" => Ok(Move::Suit(card::Suit::Hearts)),
+            "diamonds" => Ok(Move::Suit(card::Suit::Diamonds)),
+            "clubs" => Ok(Move::Suit(card::Suit::Clubs)),
+            "spades" => Ok(Move::Suit(card::Suit::Spades)),
+            "finish" => Ok(Move::Finish),
+            _ => {
+                let words: Vec<&str> = s.split_ascii_whitespace().collect();
+                if words.len() == 3 && words[1] != "of" {
+                    return Err("Parse failed");
+                }
+                let suit = match words[2] {
+                    "hearts" => card::Suit::Hearts,
+                    "diamonds" => card::Suit::Diamonds,
+                    "clubs" => card::Suit::Clubs,
+                    "spades" => card::Suit::Spades,
+                    _ => return Err("Parse failed"),
+                };
+                let value = match words[0] {
+                    "two" => card::Value::Two,
+                    "three" => card::Value::Three,
+                    "four" => card::Value::Four,
+                    "five" => card::Value::Five,
+                    "six" => card::Value::Six,
+                    "sever" => card::Value::Seven,
+                    "eight" => card::Value::Eight,
+                    "nine" => card::Value::Nine,
+                    "ten" => card::Value::Ten,
+                    "jack" => card::Value::Jack,
+                    "queen" => card::Value::Queen,
+                    "king" => card::Value::King,
+                    "ace" => card::Value::Ace,
+                    _ => return Err("Parse failed"),
+                };
+                Ok(Move::Card(card::Card::new(suit, value)))
+            }
+        }
+    }
 }
