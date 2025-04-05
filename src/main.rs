@@ -12,7 +12,7 @@ use node::Node;
 use ratatui::{
     DefaultTerminal, Frame,
     buffer::Buffer,
-    layout::Rect,
+    layout::{Constraint, Layout, Rect},
     symbols::border,
     text::{Line, Text},
     widgets::{Block, Paragraph, Widget},
@@ -63,12 +63,24 @@ impl<'a> Widget for &mut App<'a> {
     {
         let title = Line::from("Ride the bus");
 
-        let block = Block::bordered()
+        let layout = Layout::default()
+            .direction(ratatui::layout::Direction::Vertical)
+            .horizontal_margin(2)
+            .vertical_margin(1)
+            .constraints(vec![Constraint::Percentage(100), Constraint::Length(3)])
+            .split(area);
+
+        let outer_block = Block::bordered()
             .title(title.centered())
             .border_set(border::THICK);
 
-        self.current_input.set_block(block);
-        self.current_input.render(area, buf);
+        let text_block = Block::bordered().title(Line::from("Enter move"));
+
+        self.current_input.set_block(text_block);
+        self.current_input.render(layout[1], buf);
+
+        Paragraph::new("").render(layout[0], buf);
+        outer_block.render(area, buf);
     }
 }
 
