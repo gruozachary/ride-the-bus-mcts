@@ -144,6 +144,14 @@ impl<'a> Widget for &mut App<'a> {
                 vec![Line::from("Dealer's turn")],
                 Line::from("Enter dealers's move"),
             )
+        } else if let game::State::Finished(multiplier) = self.cached_state {
+            (
+                vec![Line::from(format!(
+                    "Game finished! Multiplier: {}",
+                    multiplier
+                ))],
+                Line::from(""),
+            )
         } else {
             (
                 self.best_moves
