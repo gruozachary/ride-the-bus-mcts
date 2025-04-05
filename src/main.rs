@@ -54,7 +54,7 @@ impl<'a> App<'a> {
         self.start_mcts_thread();
 
         while !self.exit {
-            if self.last_attempt.elapsed() > self.poll_time {
+            if self.last_attempt.elapsed() > self.poll_time && !self.cached_state.is_dealer_turn() {
                 self.best_moves = self.get_best_moves(5);
                 self.last_attempt = Instant::now();
             }
