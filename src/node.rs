@@ -3,7 +3,6 @@ use std::{
     sync::{
         Arc, RwLock,
         atomic::{self, AtomicBool},
-        mpsc::Receiver,
     },
 };
 

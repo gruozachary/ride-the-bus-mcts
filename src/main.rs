@@ -3,7 +3,6 @@ mod game;
 mod node;
 
 use std::{
-    fmt::format,
     io,
     sync::{
         Arc, RwLock,
@@ -13,7 +12,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, poll, read};
+use crossterm::event::{Event, KeyCode, poll, read};
 use game::Move;
 use itertools::Itertools;
 use node::Node;
@@ -22,7 +21,7 @@ use ratatui::{
     buffer::Buffer,
     layout::{Constraint, Layout, Rect},
     symbols::border,
-    text::{Line, Text},
+    text::Line,
     widgets::{Block, Paragraph, Widget},
 };
 use tui_textarea::TextArea;
