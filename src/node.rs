@@ -8,25 +8,34 @@ use crate::game::{Move, State};
 pub struct Node {
     reward: f64,
     visits: f64,
+    mov: Option<Move>,
     pub state: State,
     parent: Option<Arc<RwLock<Node>>>,
     pub children: Vec<Arc<RwLock<Node>>>,
 }
 impl Node {
-    pub fn new(state: State, parent: Arc<RwLock<Node>>) -> Arc<RwLock<Node>> {
-        Arc::new(RwLock::new(Node {
-            reward: 0.0,
-            visits: 0.0,
-            state,
-            parent: Some(parent),
-            children: vec![],
-        }))
+    pub fn new(
+        previous_state: State,
+        mov: Move,
+        parent: Arc<RwLock<Node>>,
+    ) -> Option<Arc<RwLock<Node>>> {
+        previous_state.apply_move(mov).map(|state| {
+            Arc::new(RwLock::new(Node {
+                reward: 0.0,
+                visits: 0.0,
+                mov: Some(mov),
+                state,
+                parent: Some(parent),
+                children: vec![],
+            }))
+        })
     }
 
     pub fn start() -> Arc<RwLock<Node>> {
         Arc::new(RwLock::new(Node {
             reward: 0.0,
             visits: 0.0,
+            mov: None,
             state: State::Start,
             parent: None,
             children: vec![],
@@ -71,7 +80,7 @@ impl Node {
         let state = node.read().unwrap().state;
         let children = &mut node.write().unwrap().children;
         for mov in possible_moves {
-            children.push(Node::new(state.apply_move(mov).unwrap(), node.clone()));
+            children.push(Node::new(state, mov, node.clone()).unwrap());
         }
 
         children[0].clone()
@@ -105,14 +114,14 @@ impl Node {
         }
     }
 
-    pub fn get_best_moves(&self) -> Vec<(State, f64)> {
+    pub fn get_best_moves(&self) -> Vec<(Move, f64)> {
         self.children
             .iter()
-            .map(|c| {
-                (
-                    c.read().unwrap().state,
-                    c.read().unwrap().visits / self.visits,
-                )
+            .filter_map(|c| {
+                c.read()
+                    .unwrap()
+                    .mov
+                    .map(|mov| (mov, c.read().unwrap().visits / self.visits))
             })
             .collect()
     }

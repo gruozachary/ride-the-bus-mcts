@@ -239,7 +239,7 @@ impl FromStr for Move {
                     "four" => card::Value::Four,
                     "five" => card::Value::Five,
                     "six" => card::Value::Six,
-                    "sever" => card::Value::Seven,
+                    "seven" => card::Value::Seven,
                     "eight" => card::Value::Eight,
                     "nine" => card::Value::Nine,
                     "ten" => card::Value::Ten,
