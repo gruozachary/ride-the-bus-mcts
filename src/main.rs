@@ -24,7 +24,7 @@ use ratatui::{
     text::Line,
     widgets::{Block, Paragraph, Widget},
 };
-use tui_textarea::TextArea;
+use tui_textarea::{CursorMove, TextArea};
 
 struct App<'a> {
     root: Arc<RwLock<Node>>,
@@ -95,6 +95,8 @@ impl<'a> App<'a> {
                     self.exit = true;
                 } else if key.code == KeyCode::Enter {
                     if self.try_set_new_root() {
+                        self.current_input.move_cursor(CursorMove::Head);
+                        self.current_input.delete_line_by_end();
                         self.stop_mcts.store(true, atomic::Ordering::Release);
                         while self.stop_mcts.load(atomic::Ordering::Relaxed) {}
                         self.start_mcts_thread();
