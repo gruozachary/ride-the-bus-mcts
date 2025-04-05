@@ -80,7 +80,6 @@ impl<'a> App<'a> {
 
     fn start_mcts_thread(&mut self) {
         let root = self.root.clone();
-        println!("Hello!");
         let stop = self.stop_mcts.clone();
         thread::spawn(move || {
             Node::mcts(root, stop.clone());
