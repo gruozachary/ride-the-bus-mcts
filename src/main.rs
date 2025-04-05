@@ -111,6 +111,7 @@ impl<'a> App<'a> {
         if let Ok(mov) = line.parse() {
             if let Some(new_node) = Node::find_child(self.root.clone(), mov) {
                 self.root = new_node;
+                return true;
             }
         }
         false
