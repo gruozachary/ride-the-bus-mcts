@@ -111,7 +111,7 @@ impl Node {
                 node = Node::expand(node);
             }
 
-            let reward = node.read().unwrap().state.playout(&mut rng) as f64 / 480.0;
+            let reward = node.read().unwrap().state.playout(&mut rng) as f64 / 20.0;
 
             Node::backpropagate(node, reward);
         }
