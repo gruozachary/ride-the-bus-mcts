@@ -92,7 +92,7 @@ impl State {
                 if let Move::InOut(in_out) = mov {
                     Some(State::Stage3PlayerPicked(*card, *card1, in_out))
                 } else if let Move::Finish = mov {
-                    Some(State::Finished(6))
+                    Some(State::Finished(3))
                 } else {
                     None
                 }
@@ -112,7 +112,7 @@ impl State {
                 if let Move::Suit(suit) = mov {
                     Some(State::Stage4PlayerPicked(*card, *card1, *card2, suit))
                 } else if let Move::Finish = mov {
-                    Some(State::Finished(24))
+                    Some(State::Finished(4))
                 } else {
                     None
                 }
@@ -122,7 +122,7 @@ impl State {
                     if suit != &card3.suit {
                         Some(State::Finished(0))
                     } else {
-                        Some(State::Finished(480))
+                        Some(State::Finished(20))
                     }
                 } else {
                     None
