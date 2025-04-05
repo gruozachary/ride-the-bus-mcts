@@ -1,6 +1,10 @@
 use std::{
     f64::consts::SQRT_2,
-    sync::{Arc, RwLock, mpsc::Receiver},
+    sync::{
+        Arc, RwLock,
+        atomic::{self, AtomicBool},
+        mpsc::Receiver,
+    },
 };
 
 use crate::game::{Move, State};
@@ -96,10 +100,10 @@ impl Node {
         }
     }
 
-    pub fn mcts(root: Arc<RwLock<Node>>, stop_receiver: Receiver<()>) {
+    pub fn mcts(root: Arc<RwLock<Node>>, stop: Arc<AtomicBool>) {
         let mut rng = rand::rng();
 
-        while stop_receiver.try_recv().is_err() {
+        while !stop.load(atomic::Ordering::Acquire) {
             let mut node = root.clone();
 
             node = Node::select_node(node);
@@ -124,5 +128,14 @@ impl Node {
                     .map(|mov| (mov, c.read().unwrap().visits / self.visits))
             })
             .collect()
+    }
+
+    pub fn find_child(node: Arc<RwLock<Node>>, mov: Move) -> Option<Arc<RwLock<Node>>> {
+        node.read()
+            .unwrap()
+            .children
+            .iter()
+            .find(|c| c.read().unwrap().mov == Some(mov))
+            .cloned()
     }
 }
