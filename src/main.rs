@@ -33,6 +33,7 @@ struct App<'a> {
     last_attempt: Instant,
     best_moves: Vec<(Move, f64)>,
     stop_mcts: Arc<AtomicBool>,
+    cached_state: game::State,
     exit: bool,
 }
 impl<'a> App<'a> {
@@ -40,10 +41,11 @@ impl<'a> App<'a> {
         App {
             root,
             current_input: TextArea::default(),
-            poll_time: Duration::from_millis(500),
+            poll_time: Duration::from_millis(100),
             last_attempt: Instant::now(),
             best_moves: vec![],
             stop_mcts: Arc::new(AtomicBool::new(false)),
+            cached_state: game::State::Start,
             exit: false,
         }
     }
@@ -110,6 +112,7 @@ impl<'a> App<'a> {
         if let Ok(mov) = line.parse() {
             if let Some(new_node) = Node::find_child(self.root.clone(), mov) {
                 self.root = new_node;
+                self.cached_state = self.root.read().unwrap().state;
                 return true;
             }
         }
@@ -134,18 +137,27 @@ impl<'a> Widget for &mut App<'a> {
             .title(title.centered())
             .border_set(border::THICK);
 
-        let text_block = Block::bordered().title(Line::from("Enter move"));
+        let (move_lines, prompt) = if self.cached_state.is_dealer_turn() {
+            (
+                vec![Line::from("Dealer's turn")],
+                Line::from("Enter dealers's move"),
+            )
+        } else {
+            (
+                self.best_moves
+                    .iter()
+                    .map(|(m, x)| Line::from(format!("{:?} {:.3}", m, x)))
+                    .collect::<Vec<Line>>(),
+                Line::from("Enter player's move"),
+            )
+        };
+
+        let text_block = Block::bordered().title(prompt);
 
         self.current_input.set_block(text_block);
         self.current_input.render(layout[1], buf);
 
-        Paragraph::new(
-            self.best_moves
-                .iter()
-                .map(|(m, x)| Line::from(format!("{:?} {:.3}", m, x)))
-                .collect::<Vec<Line>>(),
-        )
-        .render(layout[0], buf);
+        Paragraph::new(move_lines).render(layout[0], buf);
         outer_block.render(area, buf);
     }
 }

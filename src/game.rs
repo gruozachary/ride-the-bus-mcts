@@ -194,6 +194,20 @@ impl State {
             _ => false,
         }
     }
+
+    pub fn is_dealer_turn(&self) -> bool {
+        match self {
+            State::Start => false,
+            State::Stage1PlayerPicked(_) => true,
+            State::Stage1DealerPicked(_, _) => false,
+            State::Stage2PlayerPicked(_, _) => true,
+            State::Stage2DealerPicked(_, _, _) => false,
+            State::Stage3PlayerPicked(_, _, _) => true,
+            State::Stage3DealerPicked(_, _, _, _) => false,
+            State::Stage4PlayerPicked(_, _, _, _) => true,
+            State::Finished(_) => false,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
