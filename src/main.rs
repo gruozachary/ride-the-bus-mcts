@@ -1,60 +1,84 @@
-use std::{
-    io,
-    sync::mpsc::{self, Receiver, Sender},
-    thread, time,
-};
-
-use node::Node;
-
 mod card;
 mod game;
 mod node;
 
-fn main() {
-    let mut buf = String::new();
-    let mut root = Node::start();
+use std::{
+    io,
+    sync::{Arc, RwLock},
+};
 
-    loop {
-        let (tx, rx): (Sender<()>, Receiver<()>) = mpsc::channel();
-        let new_root = root.clone();
-        let thread_root = new_root.clone();
+use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, read};
+use node::Node;
+use ratatui::{
+    DefaultTerminal, Frame,
+    buffer::Buffer,
+    layout::Rect,
+    symbols::border,
+    text::{Line, Text},
+    widgets::{Block, Paragraph, Widget},
+};
+use tui_textarea::TextArea;
 
-        thread::spawn(move || {
-            Node::mcts(thread_root, rx);
-        });
-
-        for _ in 0..5 {
-            thread::sleep(time::Duration::from_millis(5000));
-            let best_moves = new_root.read().unwrap().get_best_moves();
-            println!("{:?}", best_moves);
+struct App<'a> {
+    root: Arc<RwLock<Node>>,
+    current_input: TextArea<'a>,
+    exit: bool,
+}
+impl<'a> App<'a> {
+    fn new(root: Arc<RwLock<Node>>) -> App<'a> {
+        App {
+            root,
+            current_input: TextArea::default(),
+            exit: false,
         }
-        println!(
-            "Best move: {:?}",
-            new_root
-                .read()
-                .unwrap()
-                .get_best_moves()
-                .iter()
-                .max_by(|(_, x), (_, y)| x.total_cmp(y))
-                .unwrap()
-        );
-        tx.send(()).unwrap();
-
-        let state = new_root.read().unwrap().state;
-
-        buf.clear();
-        println!("Current state: {:?}\nEnter move: ", state);
-        io::stdin().read_line(&mut buf).unwrap();
-
-        let search = state.apply_move(buf.trim().parse().unwrap()).unwrap();
-
-        root = new_root
-            .read()
-            .unwrap()
-            .children
-            .iter()
-            .find(|c| c.read().unwrap().state == search)
-            .unwrap()
-            .to_owned();
     }
+
+    fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
+        while !self.exit {
+            terminal.draw(|frame| self.draw(frame))?;
+            self.handle_events()?;
+        }
+        Ok(())
+    }
+
+    fn draw(&mut self, frame: &mut Frame) {
+        frame.render_widget(self, frame.area());
+    }
+
+    fn handle_events(&mut self) -> io::Result<()> {
+        if let Event::Key(key) = read()? {
+            if key.code == KeyCode::Esc {
+                self.exit = true;
+            } else {
+                self.current_input.input(key);
+            }
+        }
+        Ok(())
+    }
+}
+impl<'a> Widget for &mut App<'a> {
+    fn render(self, area: Rect, buf: &mut Buffer)
+    where
+        Self: Sized,
+    {
+        let title = Line::from("Ride the bus");
+
+        let block = Block::bordered()
+            .title(title.centered())
+            .border_set(border::THICK);
+
+        self.current_input.set_block(block);
+        self.current_input.render(area, buf);
+    }
+}
+
+fn main() -> io::Result<()> {
+    let mut terminal = ratatui::init();
+
+    let root = Node::start();
+
+    let mut app = App::new(root);
+    app.run(&mut terminal)?;
+    ratatui::restore();
+    Ok(())
 }
