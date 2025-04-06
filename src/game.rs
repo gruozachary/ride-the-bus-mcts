@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fmt, str::FromStr};
 
 use rand::seq::IndexedRandom;
 
@@ -17,6 +17,14 @@ impl HiLo {
         }
     }
 }
+impl fmt::Display for HiLo {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Higher => write!(f, "Higher"),
+            Self::Lower => write!(f, "Lower"),
+        }
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum InOut {
@@ -31,6 +39,14 @@ impl InOut {
         match self {
             Self::Inside => small < card1.value && card1.value < large,
             Self::Outside => card1.value < small || large < card1.value,
+        }
+    }
+}
+impl fmt::Display for InOut {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Inside => write!(f, "Inside"),
+            Self::Outside => write!(f, "Outside"),
         }
     }
 }
@@ -265,6 +281,18 @@ impl FromStr for Move {
                 };
                 Ok(Move::Card(card::Card::new(suit, value)))
             }
+        }
+    }
+}
+impl fmt::Display for Move {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Move::Colour(colour) => colour.fmt(f),
+            Move::HiLo(hi_lo) => hi_lo.fmt(f),
+            Move::InOut(in_out) => in_out.fmt(f),
+            Move::Suit(suit) => suit.fmt(f),
+            Move::Card(card) => card.fmt(f),
+            Move::Finish => write!(f, "Finish"),
         }
     }
 }

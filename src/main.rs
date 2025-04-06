@@ -156,7 +156,7 @@ impl<'a> Widget for &mut App<'a> {
             (
                 self.best_moves
                     .iter()
-                    .map(|(m, x)| Line::from(format!("{:?} {:.3}", m, x)))
+                    .map(|(m, x)| Line::from(format!("{} {:.3}", m, x)))
                     .collect::<Vec<Line>>(),
                 Line::from("Enter player's move"),
             )
