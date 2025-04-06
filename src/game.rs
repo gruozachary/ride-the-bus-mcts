@@ -239,7 +239,8 @@ impl FromStr for Move {
     type Err = &'static str;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
+        let s = s.to_ascii_lowercase();
+        match s.as_str() {
             "red" => Ok(Move::Colour(card::Colour::Red)),
             "black" => Ok(Move::Colour(card::Colour::Black)),
             "higher" => Ok(Move::HiLo(HiLo::Higher)),
